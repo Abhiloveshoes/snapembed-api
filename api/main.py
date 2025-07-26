@@ -10,6 +10,7 @@ from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import PlainTextResponse
+from fastapi import Request
 # ------------------- CONFIG -------------------
 
 BASE_URL = os.getenv("BASE_URL", "https://snapembed.onrender.com")  # Change if deploying elsewhere
@@ -54,7 +55,7 @@ def rate_limit_handler(request, exc):
 @app.post("/generate")
 @limiter.limit("20/minute")  # ⬅️ adjust as needed
 
-async def generate_embed(file: UploadFile = File(...)):
+async def generate_embed(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
     saved_filename = save_uploaded_file(contents, file.filename)
     public_url = f"{BASE_URL}/static/{saved_filename}"
