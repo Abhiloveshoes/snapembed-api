@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
 from fastapi import HTTPException
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from fastapi.responses import PlainTextResponse
 # ------------------- CONFIG -------------------
 
 BASE_URL = os.getenv("BASE_URL", "https://snapembed.onrender.com")  # Change if deploying elsewhere
@@ -14,6 +19,11 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # ------------------- INIT APP -------------------
 
 app = FastAPI()
+
+# ------------------- MIDDLEWARE -------------------
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +47,13 @@ def save_uploaded_file(file_data: bytes, filename: str) -> str:
 
 # ------------------- ROUTES -------------------
 
+@app.exception_handler(RateLimitExceeded)
+def rate_limit_handler(request, exc):
+    return PlainTextResponse("Rate limit exceeded", status_code=429)
+
 @app.post("/generate")
+@limiter.limit("20/minute")  # ⬅️ adjust as needed
+
 async def generate_embed(file: UploadFile = File(...)):
     contents = await file.read()
     saved_filename = save_uploaded_file(contents, file.filename)
