@@ -14,7 +14,8 @@ export default function UploadForm() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch('https://snapembed.onrender.com/generate', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate`, 
+ {
       method: 'POST',
       body: formData,
     });
