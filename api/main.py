@@ -1,34 +1,36 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import uuid
-from fastapi import HTTPException
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
-from fastapi.responses import PlainTextResponse
-from fastapi import Request
+import os
+import uuid
+
 # ------------------- CONFIG -------------------
 
-BASE_URL = os.getenv("BASE_URL", "https://snapembed.onrender.com")  # Change if deploying elsewhere
+BASE_URL = os.getenv("BASE_URL", "https://snapembed.onrender.com")
 UPLOAD_DIR = "static"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+MAX_FILE_SIZE_MB = 2
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
 # ------------------- INIT APP -------------------
 
 app = FastAPI()
 
 # ------------------- MIDDLEWARE -------------------
+
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict to ["https://snapembed.vercel.app"]
+    allow_origins=["*"],  # Restrict if needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,28 +55,8 @@ def rate_limit_handler(request, exc):
     return PlainTextResponse("Rate limit exceeded", status_code=429)
 
 @app.post("/generate")
-@limiter.limit("20/minute")  # ⬅️ adjust as needed
-
+@limiter.limit("20/minute")  # ✅ RATE LIMIT ACTIVE
 async def generate_embed(request: Request, file: UploadFile = File(...)):
-    contents = await file.read()
-    saved_filename = save_uploaded_file(contents, file.filename)
-    public_url = f"{BASE_URL}/static/{saved_filename}"
-    
-    embed_code = f'<img src="{public_url}" style="max-width: 100%;" alt="SnapEmbed" />'
-    
-    return JSONResponse(content={
-        "image_url": public_url,
-        "embed_code": embed_code,
-    })
-
-#-------------------- limits check for api-------------------
-
-
-MAX_FILE_SIZE_MB = 2
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
-
-@app.post("/generate")
-async def generate_embed(file: UploadFile = File(...)):
     contents = await file.read()
 
     # Size check
@@ -88,9 +70,9 @@ async def generate_embed(file: UploadFile = File(...)):
 
     saved_filename = save_uploaded_file(contents, file.filename)
     public_url = f"{BASE_URL}/static/{saved_filename}"
-    
+
     embed_code = f'<img src="{public_url}" style="max-width: 100%;" alt="SnapEmbed" />'
-    
+
     return JSONResponse(content={
         "image_url": public_url,
         "embed_code": embed_code,
