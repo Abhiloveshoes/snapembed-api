@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
-
+from fastapi import HTTPException
 # ------------------- CONFIG -------------------
 
 BASE_URL = os.getenv("BASE_URL", "https://snapembed.onrender.com")  # Change if deploying elsewhere
@@ -40,6 +40,35 @@ def save_uploaded_file(file_data: bytes, filename: str) -> str:
 @app.post("/generate")
 async def generate_embed(file: UploadFile = File(...)):
     contents = await file.read()
+    saved_filename = save_uploaded_file(contents, file.filename)
+    public_url = f"{BASE_URL}/static/{saved_filename}"
+    
+    embed_code = f'<img src="{public_url}" style="max-width: 100%;" alt="SnapEmbed" />'
+    
+    return JSONResponse(content={
+        "image_url": public_url,
+        "embed_code": embed_code,
+    })
+
+#-------------------- limits check for api-------------------
+
+
+MAX_FILE_SIZE_MB = 2
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+@app.post("/generate")
+async def generate_embed(file: UploadFile = File(...)):
+    contents = await file.read()
+
+    # Size check
+    if len(contents) > MAX_FILE_SIZE_MB * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="File too large. Max 2MB allowed.")
+
+    # Extension check
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported file type.")
+
     saved_filename = save_uploaded_file(contents, file.filename)
     public_url = f"{BASE_URL}/static/{saved_filename}"
     
