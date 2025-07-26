@@ -1,38 +1,31 @@
 // app/page.tsx
 'use client';
 
-import Link from 'next/link';
+import UploadForm from './upload-form';
 
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-800 p-8">
-      <section className="max-w-3xl mx-auto text-center py-12">
-        <h1 className="text-4xl font-bold mb-4">SnapEmbed API</h1>
+    <main className="flex flex-col items-center justify-start min-h-screen p-6 bg-white text-gray-800">
+      {/* Hero Section */}
+      <section className="text-center max-w-2xl my-12">
+        <h1 className="text-4xl font-bold mb-4">SnapEmbed</h1>
         <p className="text-lg mb-6">
-          Upload a social media screenshot → Get a hosted image + embed code.
+          Upload a screenshot. Get a public link + embeddable code instantly.
         </p>
-        <a
-          href="#demo"
-          className="bg-blue-600 text-white px-6 py-3 rounded font-semibold"
-        >
-          Try it Now
-        </a>
+        <p className="text-sm text-gray-500">
+          Perfect for creators, bloggers, and marketers.
+        </p>
       </section>
 
-      <section className="max-w-4xl mx-auto mt-16" id="demo">
-        <h2 className="text-2xl font-semibold mb-4">Live Demo</h2>
-        <p className="mb-4 text-gray-600">
-          Upload a screenshot below to see how the embed works:
-        </p>
-        <iframe
-          src="/"
-          className="w-full h-[550px] border rounded shadow"
-        />
+      {/* Upload Demo */}
+      <section className="w-full flex justify-center my-4" id="demo">
+        <UploadForm />
       </section>
 
-      <section className="max-w-4xl mx-auto mt-16">
-        <h2 className="text-2xl font-semibold mb-4">API Usage</h2>
-        <pre className="bg-gray-100 p-4 rounded text-left text-sm overflow-x-auto">
+      {/* API Usage */}
+      <section className="mt-20 max-w-2xl w-full">
+        <h2 className="text-2xl font-semibold mb-4">🛠️ API Usage</h2>
+        <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
 {`POST https://snapembed.onrender.com/generate
 
 FormData:
@@ -42,19 +35,24 @@ Response:
 {
   "image_url": "https://...",
   "embed_code": "<img src='...'>"
-}
-`}
+}`}
         </pre>
       </section>
 
-      <section className="max-w-4xl mx-auto mt-16 mb-24">
-        <h2 className="text-2xl font-semibold mb-4">Pricing</h2>
-        <ul className="text-left space-y-3 text-gray-700">
+      {/* Pricing */}
+      <section className="mt-16 max-w-2xl w-full text-left mb-20">
+        <h2 className="text-2xl font-semibold mb-4">💰 Pricing</h2>
+        <ul className="space-y-3 text-gray-700 text-base">
           <li>✅ Free Tier: 100 uploads/month</li>
-          <li>💼 Paid Tier: $5/month for 1,000 uploads</li>
+          <li>💼 Pro Tier: $5/month for 1,000 uploads</li>
           <li>📦 Enterprise: Custom pricing</li>
         </ul>
       </section>
+
+      {/* Footer */}
+      <footer className="text-center text-sm text-gray-500 py-6 border-t w-full">
+        © 2025 SnapEmbed · Made for developers & creators
+      </footer>
     </main>
   );
 }
