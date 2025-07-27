@@ -48,6 +48,17 @@ Response:
           <li>📦 Enterprise: Custom pricing</li>
         </ul>
       </section>
+      {/* Upgrade Button */}
+
+      <section className="text-center mt-8">
+      <a
+         href="https://buy.stripe.com/test_dummy" // Replace with real link later
+        className="inline-block bg-green-600 text-white px-6 py-3 rounded font-semibold hover:bg-green-700 transition"
+          >
+            Upgrade to Pro
+       </a>
+      </section>
+
 
       {/* Footer */}
       <footer className="text-center text-sm text-gray-500 py-6 border-t w-full">
