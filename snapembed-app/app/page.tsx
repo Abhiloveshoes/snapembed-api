@@ -18,7 +18,7 @@ export default function HomePage() {
       </section>
 
       {/* Upload Demo */}
-      <section className="w-full flex justify-center my-4" id="demo">
+      <section className="w-full flex justify-center my-4 text-sm text-white-100" id="demo">
         <UploadForm />
       </section>
 

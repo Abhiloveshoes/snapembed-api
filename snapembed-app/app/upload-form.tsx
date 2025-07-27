@@ -40,6 +40,7 @@ export default function UploadForm() {
 
   return (
     <div className="bg-black p-6 rounded shadow w-full max-w-md">
+       <Toaster position="top-center" />
       <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} />
       <button
         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
