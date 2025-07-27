@@ -21,6 +21,10 @@ ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 # ------------------- INIT APP -------------------
 
 app = FastAPI()
+@app.get("/ping")
+async def ping():
+    return {"status": "awake"}
+
 
 # ------------------- MIDDLEWARE -------------------
 
